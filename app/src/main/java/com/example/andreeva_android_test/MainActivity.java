@@ -3,13 +3,11 @@ package com.example.andreeva_android_test;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,16 +18,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
-
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -53,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         calendarView = findViewById(R.id.calendarView);
         dateView = findViewById(R.id.textView);
         listView = findViewById(R.id.list);
+        //при нажатии на элемент списка передаем данные из него и переходим на другую активность
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String text = listView.getItemAtPosition(position).toString();
@@ -68,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<CalendarDate>(context, android.R.layout.simple_list_item_1, calendarDates);
         listView.setAdapter(adapter);
 
+        //при выборе дня в календаре отображаем список дел
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
@@ -78,31 +71,31 @@ public class MainActivity extends AppCompatActivity {
                 adapter.clear();
                 adapter.notifyDataSetChanged();
 
-                Calendar thisDayStart = Calendar.getInstance();
-                thisDayStart.set(Calendar.YEAR, year);
-                thisDayStart.set(Calendar.MONTH, month);
-                thisDayStart.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                thisDayStart.set(Calendar.HOUR_OF_DAY, 0);
-                thisDayStart.set(Calendar.MINUTE, 0);
-                thisDayStart.set(Calendar.SECOND, 0);
-
-                Calendar thisDayEnd = Calendar.getInstance();
-                thisDayEnd.set(Calendar.YEAR, year);
-                thisDayEnd.set(Calendar.MONTH, month);
-                thisDayEnd.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                thisDayEnd.set(Calendar.HOUR_OF_DAY, 23);
-                thisDayEnd.set(Calendar.MINUTE, 59);
-                thisDayEnd.set(Calendar.SECOND, 59);
-
-                Timestamp startTS = new Timestamp(thisDayStart.getTimeInMillis());
-                Timestamp endTS = new Timestamp(thisDayEnd.getTimeInMillis());
-
                 calendarDates = JSONHelper.importFromJSON(context);
                 List<CalendarDate> calendarToday = new ArrayList<>();
 
                 CalendarDate temp = new CalendarDate();
 
                 if(calendarDates!=null) {
+
+                    Calendar thisDayStart = Calendar.getInstance();
+                    thisDayStart.set(Calendar.YEAR, year);
+                    thisDayStart.set(Calendar.MONTH, month);
+                    thisDayStart.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    thisDayStart.set(Calendar.HOUR_OF_DAY, 0);
+                    thisDayStart.set(Calendar.MINUTE, 0);
+                    thisDayStart.set(Calendar.SECOND, 0);
+
+                    Calendar thisDayEnd = Calendar.getInstance();
+                    thisDayEnd.set(Calendar.YEAR, year);
+                    thisDayEnd.set(Calendar.MONTH, month);
+                    thisDayEnd.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    thisDayEnd.set(Calendar.HOUR_OF_DAY, 23);
+                    thisDayEnd.set(Calendar.MINUTE, 59);
+                    thisDayEnd.set(Calendar.SECOND, 59);
+
+                    Timestamp startTS = new Timestamp(thisDayStart.getTimeInMillis());
+                    Timestamp endTS = new Timestamp(thisDayEnd.getTimeInMillis());
 
                     for (int i = 0; i < calendarDates.size(); i++) {
                         if (calendarDates.get(i).getDate_start().after(startTS)) {
@@ -125,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //для добавления даты переходим на другую активность
     public void addDate(View v){
         Intent i;
         i = new Intent(this, AddDateActivity.class);
@@ -132,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //меню(тулбар)
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.info_menu, menu);

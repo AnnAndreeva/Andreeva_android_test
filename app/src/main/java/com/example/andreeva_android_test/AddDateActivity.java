@@ -90,7 +90,7 @@ public class AddDateActivity extends AppCompatActivity {
 
     }
 
-
+    //устанавливаем  текущую дату для события
     private void setInitialDateTime() {
         currentDateTime.setText(DateUtils.formatDateTime(this,
                 dateAndTimeStart.getTimeInMillis(),
@@ -105,6 +105,7 @@ public class AddDateActivity extends AppCompatActivity {
                 dateAndTimeFinish.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
     }
 
+    //устанавливаем заданную пользователем дату(с проверкой)
     private void setDateTime() {
         currentDateTime.setText(DateUtils.formatDateTime(this,
                 dateAndTimeStart.getTimeInMillis(),
@@ -185,6 +186,7 @@ public class AddDateActivity extends AppCompatActivity {
         }
     };
 
+    //меню(тулбар)
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.info_menu, menu);
