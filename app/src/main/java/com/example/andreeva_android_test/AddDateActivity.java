@@ -54,12 +54,18 @@ public class AddDateActivity extends AppCompatActivity {
     // сохраняем созданное событие в json
     public void saveDate(View v) {
         CalendarDate calendarDate = new CalendarDate();
-        if(!nameText.getText().toString().isEmpty()){
+
+        if(!nameText.getText().toString().equals("")){
             calendarDate.setName(nameText.getText().toString());
+            if(descriptionText.getText().toString().equals("")){
+                descriptionText.setText("Нет описания");
+            }
+
             calendarDate.setDescription(descriptionText.getText().toString());
             calendarDate.setDate_start(new Timestamp(dateAndTimeStart.getTimeInMillis()));
             calendarDate.setDate_finish(new Timestamp(dateAndTimeFinish.getTimeInMillis()));
             calendarDates.add(calendarDate);
+
             boolean result = JSONHelper.exportToJSON(this, calendarDates);
             if(result){
                 Toast.makeText(this, "Данные сохранены", Toast.LENGTH_LONG).show();
@@ -92,10 +98,37 @@ public class AddDateActivity extends AppCompatActivity {
                 dateAndTimeStart.getTimeInMillis(),
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR
                         | DateUtils.FORMAT_SHOW_TIME));
+
+        dateAndTimeFinish.set(dateAndTimeStart.get(Calendar.YEAR), dateAndTimeStart.get(Calendar.MONTH), dateAndTimeStart.get(Calendar.DAY_OF_MONTH),
+                dateAndTimeStart.get(Calendar.HOUR_OF_DAY), dateAndTimeStart.get(Calendar.MINUTE));
+        dateAndTimeFinish.add(Calendar.HOUR_OF_DAY, 1);
+
+        currentDateTime.append("; "+DateUtils.formatDateTime(this,
+                dateAndTimeFinish.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
+    }
+
+    private void setDateTime() {
         currentDateTime.setText(DateUtils.formatDateTime(this,
-                dateAndTimeFinish.getTimeInMillis(),
+                dateAndTimeStart.getTimeInMillis(),
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR
                         | DateUtils.FORMAT_SHOW_TIME));
+
+
+        //проверка совпадения значения времени начала и времени завершения
+        if((dateAndTimeStart.get(Calendar.YEAR) == dateAndTimeFinish.get(Calendar.YEAR)) &&
+                (dateAndTimeStart.get(Calendar.MONTH) == dateAndTimeFinish.get(Calendar.MONTH)) &&
+                (dateAndTimeStart.get(Calendar.DAY_OF_MONTH) == dateAndTimeFinish.get(Calendar.DAY_OF_MONTH))&&
+                ((dateAndTimeStart.get(Calendar.HOUR_OF_DAY) >= dateAndTimeFinish.get(Calendar.HOUR_OF_DAY))
+                    ||((dateAndTimeStart.get(Calendar.HOUR_OF_DAY) == dateAndTimeFinish.get(Calendar.HOUR_OF_DAY) &&
+                        (dateAndTimeStart.get(Calendar.MINUTE) >= dateAndTimeFinish.get(Calendar.MINUTE))))))
+        {
+            dateAndTimeFinish.set(dateAndTimeStart.get(Calendar.YEAR), dateAndTimeStart.get(Calendar.MONTH), dateAndTimeStart.get(Calendar.DAY_OF_MONTH),
+                    dateAndTimeStart.get(Calendar.HOUR_OF_DAY), dateAndTimeStart.get(Calendar.MINUTE));
+            dateAndTimeFinish.add(Calendar.HOUR_OF_DAY, 1);
+        }
+
+        currentDateTime.append("; "+DateUtils.formatDateTime(this,
+                dateAndTimeFinish.getTimeInMillis(), DateUtils.FORMAT_SHOW_TIME));
     }
 
     // отображаем диалоговое окно для выбора даты
@@ -127,7 +160,7 @@ public class AddDateActivity extends AppCompatActivity {
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             dateAndTimeStart.set(Calendar.HOUR_OF_DAY, hourOfDay);
             dateAndTimeStart.set(Calendar.MINUTE, minute);
-            setInitialDateTime();
+            setDateTime();
         }
     };
 
@@ -135,7 +168,7 @@ public class AddDateActivity extends AppCompatActivity {
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             dateAndTimeFinish.set(Calendar.HOUR_OF_DAY, hourOfDay);
             dateAndTimeFinish.set(Calendar.MINUTE, minute);
-            setInitialDateTime();
+            setDateTime();
         }
     };
 
@@ -145,7 +178,12 @@ public class AddDateActivity extends AppCompatActivity {
             dateAndTimeStart.set(Calendar.YEAR, year);
             dateAndTimeStart.set(Calendar.MONTH, monthOfYear);
             dateAndTimeStart.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-            setInitialDateTime();
+
+
+            dateAndTimeFinish.set(Calendar.YEAR, year);
+            dateAndTimeFinish.set(Calendar.MONTH, monthOfYear);
+            dateAndTimeFinish.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            setDateTime();
         }
     };
 
@@ -164,7 +202,7 @@ public class AddDateActivity extends AppCompatActivity {
             case R.id.action_info:
                 AlertDialog.Builder builder = new AlertDialog.Builder(AddDateActivity.this);
                 builder.setTitle("Информация об авторе")
-                        .setMessage("Андреева Анна\n email: annandreeva21@gmail.com")
+                        .setMessage("Андреева Анна\nemail: annandreeva21@gmail.com\nGitHub:https://github.com/AnnAndreeva")
                         .setCancelable(false)
                         .setNegativeButton("ОК",
                                 new DialogInterface.OnClickListener() {

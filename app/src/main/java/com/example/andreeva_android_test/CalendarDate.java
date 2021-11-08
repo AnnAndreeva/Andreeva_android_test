@@ -48,6 +48,6 @@ public class CalendarDate {
 
     @Override
     public String toString() {
-        return "Начало: " + date_start + "\nКонец: " + date_start + "\nНазвание:" + name + "\nОписание:" + description;
+        return "Начало: " + date_start + "\nКонец: " + date_finish + "\nНазвание:" + name + "\nОписание:" + description;
     }
 }

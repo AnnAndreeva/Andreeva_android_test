@@ -29,6 +29,10 @@ android {
         viewBinding true
     }
 
+    aaptOptions {
+        noCompress "json"
+    }
+
 }
 
 dependencies {

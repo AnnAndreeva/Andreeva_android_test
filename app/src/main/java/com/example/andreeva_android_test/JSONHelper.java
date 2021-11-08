@@ -1,16 +1,25 @@
 package com.example.andreeva_android_test;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
 class JSONHelper {
 
     private static final String FILE_NAME = "data.json";
+
 
     //Для сериализации данных в формат json
     static boolean exportToJSON(Context context, List<CalendarDate> dataList) {
@@ -19,10 +28,10 @@ class JSONHelper {
         DataItems dataItems = new DataItems();
         dataItems.setCalendarDates(dataList);
         String jsonString = gson.toJson(dataItems);
-
-        try(FileOutputStream fileOutputStream =
-                    context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE)) {
+        try (FileOutputStream fileOutputStream = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE))
+        {
             fileOutputStream.write(jsonString.getBytes());
+            fileOutputStream.close();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
@@ -38,7 +47,11 @@ class JSONHelper {
             InputStreamReader streamReader = new InputStreamReader(fileInputStream)){
 
             Gson gson = new Gson();
+
             DataItems dataItems = gson.fromJson(streamReader, DataItems.class);
+            streamReader.close();
+            fileInputStream.close();
+
             return  dataItems.getCalendarDates();
         }
         catch (IOException ex){
@@ -55,6 +68,7 @@ class JSONHelper {
         List<CalendarDate> getCalendarDates() {
             return calendarDates;
         }
+
         void setCalendarDates(List<CalendarDate> calendarDates) {
             this.calendarDates = calendarDates;
         }
