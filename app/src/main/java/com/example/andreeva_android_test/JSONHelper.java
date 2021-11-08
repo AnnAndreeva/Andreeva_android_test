@@ -24,12 +24,29 @@ class JSONHelper {
     //Для сериализации данных в формат json
     static boolean exportToJSON(Context context, List<CalendarDate> dataList) {
 
-        Gson gson = new Gson();
+        Gson gsonIn = new Gson();
         DataItems dataItems = new DataItems();
         dataItems.setCalendarDates(dataList);
-        String jsonString = gson.toJson(dataItems);
-        try (FileOutputStream fileOutputStream = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE))
-        {
+        String jsonString = "";
+        //считываем файл, если он не пуст, и сохраняем из него данные, если пуст, то переходим к созданию
+        try {
+            FileInputStream fileInputStream = context.openFileInput(FILE_NAME);
+
+            InputStreamReader streamReader = new InputStreamReader(fileInputStream);
+
+            DataItems dataItemsIn = gsonIn.fromJson(streamReader, DataItems.class);
+            dataItemsIn.appendCalendarDates(dataList);
+            jsonString = gsonIn.toJson(dataItemsIn);
+            streamReader.close();
+
+
+        } catch (IOException ex) {
+            jsonString = gsonIn.toJson(dataItems);
+            ex.printStackTrace();
+        }
+
+        //создаем(пересоздаем файл)
+        try (FileOutputStream fileOutputStream = context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE)) {
             fileOutputStream.write(jsonString.getBytes());
             fileOutputStream.close();
             return true;
@@ -43,8 +60,8 @@ class JSONHelper {
     //Для десериализации данных из формата json
     static List<CalendarDate> importFromJSON(Context context) {
 
-        try(FileInputStream fileInputStream = context.openFileInput(FILE_NAME);
-            InputStreamReader streamReader = new InputStreamReader(fileInputStream)){
+        try (FileInputStream fileInputStream = context.openFileInput(FILE_NAME);
+             InputStreamReader streamReader = new InputStreamReader(fileInputStream)) {
 
             Gson gson = new Gson();
 
@@ -52,9 +69,8 @@ class JSONHelper {
             streamReader.close();
             fileInputStream.close();
 
-            return  dataItems.getCalendarDates();
-        }
-        catch (IOException ex){
+            return dataItems.getCalendarDates();
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 
@@ -71,6 +87,12 @@ class JSONHelper {
 
         void setCalendarDates(List<CalendarDate> calendarDates) {
             this.calendarDates = calendarDates;
+        }
+
+        void appendCalendarDates(List<CalendarDate> calendarDates) {
+            for (int i = 0; i < calendarDates.size(); i++) {
+                this.calendarDates.add(calendarDates.get(i));
+            }
         }
     }
 }
